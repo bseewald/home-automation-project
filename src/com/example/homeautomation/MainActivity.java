@@ -31,7 +31,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch(v.getId()) {
 		
 			case R.id.ConnectApp: {
+				
+				//Verificação se o wifi está ON
 			    
+				
+				//Estando ligado segue para a tela dos sensores (sockets aqui ?)
 				final Intent intent = new Intent(this, AcquirementActivity.class);
 				this.startActivity(intent);
 			}	

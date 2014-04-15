@@ -3,6 +3,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/linearlayout_temp"
     tools:context="com.example.homeautomation.MainActivity"
     tools:ignore="MergeRootFrame" >
 
@@ -23,7 +24,7 @@
         android:layout_above="@+id/LogoApp"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="42dp"
-        android:text="SmartHouseControl"
+        android:text="Smart House Control"
         android:textSize="14pt" />
 
     <ImageView

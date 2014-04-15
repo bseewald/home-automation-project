@@ -6,44 +6,10 @@
     tools:context=".AcquirementActivity" >
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/linearlayout_temp"
-        android:onClick="Values"
-        android:orientation="horizontal"
-        android:padding="20dp" >
-
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="45dp"
-            android:layout_height="50dp"
-            android:src="@drawable/thermometer" />
-
-        <TextView
-            android:id="@+id/txTemp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Temperature "
-            android:textColor="@android:color/white"
-            android:textSize="10pt" />
-
-        <ToggleButton
-            android:id="@+id/btnTemp"
-            android:layout_width="60dp"
-            android:layout_height="50dp"
-            android:layout_weight="2.05"
-            android:text="Temp"
-            android:textColor="@android:color/white" />
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/linearLayout1"
-        android:background="@drawable/linearlayout_temp"
         android:orientation="horizontal"
         android:padding="20dp" >
 
@@ -58,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="   Motion          "
-            android:textColor="@android:color/white"
+            android:textColor="@android:color/black"
             android:textSize="10pt" />
 
         <ToggleButton
@@ -67,7 +33,7 @@
             android:layout_height="50dp"
             android:layout_weight="2.05"
             android:text="Motion"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/black" />
     </LinearLayout>
 
     <LinearLayout
@@ -76,7 +42,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/linearLayout2"
-        android:background="@drawable/linearlayout_temp"
         android:orientation="horizontal"
         android:padding="20dp" >
 
@@ -91,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="  Gas               "
-            android:textColor="@android:color/white"
+            android:textColor="@android:color/black"
             android:textSize="10pt" />
 
         <ToggleButton
@@ -100,7 +65,7 @@
             android:layout_height="50dp"
             android:layout_weight="2.05"
             android:text="Gas"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/black" />
     </LinearLayout>
 
     <LinearLayout
@@ -109,7 +74,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/linearLayout3"
-        android:background="@drawable/linearlayout_temp"
         android:orientation="horizontal"
         android:padding="20dp" >
 
@@ -124,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=" Luminosity     "
-            android:textColor="@android:color/white"
+            android:textColor="@android:color/black"
             android:textSize="10pt" />
 
         <ToggleButton
@@ -133,7 +97,7 @@
             android:layout_height="50dp"
             android:layout_weight="2.05"
             android:text="Light"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/black" />
     </LinearLayout>
 
     <LinearLayout
@@ -142,9 +106,57 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/linearLayout4"
-        android:background="@drawable/linearlayout_temp"
         android:orientation="horizontal"
-        android:padding="120dp" >
+        android:padding="20dp" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="45dp"
+            android:layout_height="50dp"
+            android:src="@drawable/thermometer" />
+
+        <TextView
+            android:id="@+id/txTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temperature  "
+            android:textColor="@android:color/black"
+            android:textSize="10pt" />
+
+        <ToggleButton
+            android:id="@+id/btnTemp"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:layout_weight="2.05"
+            android:text="Temp"
+            android:textColor="@android:color/black" />
     </LinearLayout>
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout5"
+        android:layout_toRightOf="@+id/txTempValue"
+        android:ems="3" />
+
+    <TextView
+        android:id="@+id/txTempValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/editText1"
+        android:layout_alignBottom="@+id/editText1"
+        android:layout_alignRight="@+id/button1"
+        android:text="Temperature Now:"
+        android:textSize="8pt" />
+
+    <Button
+        android:id="@+id/button1"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editText1"
+        android:layout_centerHorizontal="true"
+        android:text="Update" />
 
 </RelativeLayout>
