@@ -2,11 +2,14 @@ package com.example.homeautomation;
 
 import com.example.homeautomation.R;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * @author Bruna Seewald <brubetinha@gmail.com> 
@@ -15,14 +18,44 @@ import android.widget.Button;
 
 public class MainActivity extends Activity implements OnClickListener {
 
+	/*
+	 * Static instance of itself.
+	 */
+	public static Context context;
+	
+	// Services.
+	private WifiManager wifiManager;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		final Button startBtn = (Button) this.findViewById(R.id.ConnectApp);
+		// Define a static context. Useful for the anonymous events.
+		context = getApplicationContext();
+		
+		// Initialize services instances.
+		this.initializeServices();
+		
+		// Initialize view components.
+		this.initializeComponents();
+		
+	}
+		
+	/**
+	 * Initialize all services.
+	 */
+	private void initializeServices() {		
+		// WIFI service manager.
+		this.wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+	}
+	
+	/**
+	 * Initialize all view components.
+	 */
+	private void initializeComponents() {
+		final Button startBtn = (Button) this.findViewById(R.id.EnterApp);
 		startBtn.setOnClickListener(this);
-
 	}
 
 	@Override
@@ -30,14 +63,19 @@ public class MainActivity extends Activity implements OnClickListener {
 		// TODO Auto-generated method stub
 		switch(v.getId()) {
 		
-			case R.id.ConnectApp: {
+			case R.id.EnterApp: {
 				
-				//Verificação se o wifi está ON
-			    
+				//Wi-Fi state (On or Off)
+				if(this.wifiManager.isWifiEnabled()){	
+					//if enable, start the new activity
+					final Intent intent = new Intent(this, AcquirementActivity.class);
+					this.startActivity(intent);
+				}
+				else{
+					// Display message.
+			    	Toast.makeText(MainActivity.context, "Please, enable the WIFI to connect to the server.", Toast.LENGTH_LONG).show();
+				}
 				
-				//Estando ligado segue para a tela dos sensores (sockets aqui ?)
-				final Intent intent = new Intent(this, AcquirementActivity.class);
-				this.startActivity(intent);
 			}	
 		}	
 	}

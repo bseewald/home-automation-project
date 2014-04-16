@@ -8,14 +8,14 @@
     tools:ignore="MergeRootFrame" >
 
     <Button
-        android:id="@+id/ConnectApp"
+        android:id="@+id/EnterApp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="71dp"
-        android:onClick="btConnectServer"
-        android:text="Connect" />
+        android:onClick="btEnterApp"
+        android:text="Enter" />
 
     <TextView
         android:id="@+id/NameApp"

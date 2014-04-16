@@ -32,8 +32,10 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="2.05"
+            android:freezesText="true"
             android:text="Motion"
             android:textColor="@android:color/black" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -132,31 +134,41 @@
             android:textColor="@android:color/black" />
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/editText1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/linearLayout5"
-        android:layout_toRightOf="@+id/txTempValue"
-        android:ems="3" />
-
     <TextView
         android:id="@+id/txTempValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/editText1"
-        android:layout_alignBottom="@+id/editText1"
-        android:layout_alignRight="@+id/button1"
+        android:layout_alignRight="@+id/btnUpdate"
+        android:layout_below="@+id/linearLayout5"
+        android:layout_marginRight="16dp"
         android:text="Temperature Now:"
         android:textSize="8pt" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/btnUpdate"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editText1"
+        android:layout_below="@+id/txTempValue"
         android:layout_centerHorizontal="true"
         android:text="Update" />
+
+    <TextView
+        android:id="@+id/textValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnUpdate"
+        android:layout_toRightOf="@+id/txTempValue"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/btnConnect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="19dp"
+        android:text="Connect" />
 
 </RelativeLayout>
