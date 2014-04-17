@@ -14,6 +14,7 @@ import java.net.SocketAddress;
 
 import android.os.AsyncTask;
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 /**
@@ -28,7 +30,7 @@ import android.widget.ToggleButton;
  *
  */
 public class AcquirementActivity extends Activity {
-
+	
 	private static final String TAG = "HomeAutomation";
 
 	ToggleButton btnMove, btnGas, btnLight, btnTemp;
@@ -63,7 +65,7 @@ public class AcquirementActivity extends Activity {
 		btnTemp.setOnClickListener(tempOnClickListener);
 		btnUpdate.setOnClickListener(buttonUpdateOnClickListener);
 		btnConnect.setOnClickListener(buttonOnClickListener);
-
+		
 		//Create initial instance so SendDataToNetwork doesn't throw an error.
 		networktask = new NetworkTask();
 		
@@ -93,56 +95,123 @@ public class AcquirementActivity extends Activity {
 	//Toogle Buttons
 	private OnClickListener moveOnClickListener = new OnClickListener() {
 		public void onClick(View v){
-			SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-			SharedPreferences.Editor editor = preferences.edit();
-			//Value stored
-			editor.putBoolean("btnMove", btnMove.isChecked());
-			editor.commit();  
-			
-			//TODO: enviar o comando para ligar o sensor
+
+			//Connected to the server
+			if(networktask.isConnected()){
+				SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+				SharedPreferences.Editor editor = preferences.edit();
+				//Value stored
+				editor.putBoolean("btnMove", btnMove.isChecked());
+				editor.commit();  
+
+				if(!btnMove.isChecked()){
+					//Button is OFF, turn ON and send the command to Arduino
+					networktask.SendDataToNetwork("setOn");
+				}
+				else{
+					//Button is ON, turn OFF and send the command to Arduino
+					networktask.SendDataToNetwork("setOff");
+				}
+			}
+			else{
+				btnMove.setChecked(false);
+				Toast.makeText(AcquirementActivity.this, "Please, connect to the server.", Toast.LENGTH_LONG).show();
+			}
 		}
 	};
 
 	private OnClickListener gasOnClickListener = new OnClickListener() {
 		public void onClick(View v){
-			SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-			SharedPreferences.Editor editor = preferences.edit();
-			//Value stored
-			editor.putBoolean("btnGas", btnGas.isChecked());
-			editor.commit();
 			
-			//TODO: enviar o comando para ligar o sensor
+			//Connected to the server
+			if(networktask.isConnected()){
+				SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+				SharedPreferences.Editor editor = preferences.edit();
+				//Value stored
+				editor.putBoolean("btnGas", btnGas.isChecked());
+				editor.commit();
+
+				if(!btnGas.isChecked()){
+					//Button is OFF, turn ON and send the command to Arduino
+					networktask.SendDataToNetwork("setOn");
+				}
+				else{
+					//Button is ON, turn OFF and send the command to Arduino
+					networktask.SendDataToNetwork("setOff");
+				}
+			}
+			else{
+				btnGas.setChecked(false);
+				Toast.makeText(AcquirementActivity.this, "Please, connect to the server.", Toast.LENGTH_LONG).show();
+			}
 		}
 	};
 
 	private OnClickListener lightOnClickListener = new OnClickListener() {
 		public void onClick(View v){
-			SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-			SharedPreferences.Editor editor = preferences.edit();
-			//Value stored
-			editor.putBoolean("btnLight", btnLight.isChecked());
-			editor.commit();
 			
-			//TODO: enviar o comando para ligar o sensor
+			//Connected to the server
+			if(networktask.isConnected()){
+				SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+				SharedPreferences.Editor editor = preferences.edit();
+				//Value stored
+				editor.putBoolean("btnLight", btnLight.isChecked());
+				editor.commit();
+
+				if(!btnLight.isChecked()){
+					//Button is OFF, turn ON and send the command to Arduino
+					networktask.SendDataToNetwork("setOn");
+				}
+				else{
+					//Button is ON, turn OFF and send the command to Arduino
+					networktask.SendDataToNetwork("setOff");
+				}
+			}
+			else{
+				btnLight.setChecked(false);
+				Toast.makeText(AcquirementActivity.this, "Please, connect to the server.", Toast.LENGTH_LONG).show();
+			}
 		}
 	};
 
 	private OnClickListener tempOnClickListener = new OnClickListener() {
 		public void onClick(View v){
-			SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-			SharedPreferences.Editor editor = preferences.edit();
-			//Value stored
-			editor.putBoolean("btnTemp", btnTemp.isChecked());
-			editor.commit();
 			
-			//TODO: enviar o comando para ligar o sensor
+			//Connected to the server
+			if(networktask.isConnected()){
+				SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+				SharedPreferences.Editor editor = preferences.edit();
+				//Value stored
+				editor.putBoolean("btnTemp", btnTemp.isChecked());
+				editor.commit();
+
+				if(!btnTemp.isChecked()){
+					//Button is OFF, turn ON and send the command to Arduino
+					networktask.SendDataToNetwork("setOn");
+				}
+				else{
+					//Button is ON, turn OFF and send the command to Arduino
+					networktask.SendDataToNetwork("setOff");
+				}
+			}
+			else{
+				btnTemp.setChecked(false);
+				Toast.makeText(AcquirementActivity.this, "Please, connect to the server.", Toast.LENGTH_LONG).show();
+			}
 		}
 	};
 
 	//Update Button
 	private OnClickListener buttonUpdateOnClickListener = new OnClickListener() {
 		public void onClick(View v){
-			//if()
+			//Checks if the sensor is ON
+			if(btnTemp.isChecked()){
+				//Command to update de temperature value
+				networktask.SendDataToNetwork("tempValue");
+			}
+			else{
+				Toast.makeText(AcquirementActivity.this, "Please, turn ON the temperature sensor", Toast.LENGTH_LONG).show();
+			}
 		}
 	};
 
@@ -290,6 +359,7 @@ public class AcquirementActivity extends Activity {
 	public void changeConnectionStatus(Boolean isConnected) {
 		//Change variable
 		networktask.setConnected(isConnected);
+		
 		//If connection established
 		if(networktask.isConnected()){
 			Log.d(TAG,"successfully connected to server");
