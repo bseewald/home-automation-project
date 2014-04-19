@@ -14,7 +14,6 @@ import java.net.SocketAddress;
 
 import android.os.AsyncTask;
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -104,13 +103,13 @@ public class AcquirementActivity extends Activity {
 				editor.putBoolean("btnMove", btnMove.isChecked());
 				editor.commit();  
 
-				if(!btnMove.isChecked()){
+				if(btnMove.isChecked()){
 					//Button is OFF, turn ON and send the command to Arduino
-					networktask.SendDataToNetwork("setOn");
+					networktask.SendDataToNetwork("setOnMove"+'\n');
 				}
 				else{
 					//Button is ON, turn OFF and send the command to Arduino
-					networktask.SendDataToNetwork("setOff");
+					networktask.SendDataToNetwork("setOffMove"+'\n');
 				}
 			}
 			else{
@@ -131,13 +130,13 @@ public class AcquirementActivity extends Activity {
 				editor.putBoolean("btnGas", btnGas.isChecked());
 				editor.commit();
 
-				if(!btnGas.isChecked()){
+				if(btnGas.isChecked()){
 					//Button is OFF, turn ON and send the command to Arduino
-					networktask.SendDataToNetwork("setOn");
+					networktask.SendDataToNetwork("setOnGas"+'\n');
 				}
 				else{
 					//Button is ON, turn OFF and send the command to Arduino
-					networktask.SendDataToNetwork("setOff");
+					networktask.SendDataToNetwork("setOffGas"+'\n');
 				}
 			}
 			else{
@@ -158,13 +157,13 @@ public class AcquirementActivity extends Activity {
 				editor.putBoolean("btnLight", btnLight.isChecked());
 				editor.commit();
 
-				if(!btnLight.isChecked()){
+				if(btnLight.isChecked()){
 					//Button is OFF, turn ON and send the command to Arduino
-					networktask.SendDataToNetwork("setOn");
+					networktask.SendDataToNetwork("setOnLight"+'\n');
 				}
 				else{
 					//Button is ON, turn OFF and send the command to Arduino
-					networktask.SendDataToNetwork("setOff");
+					networktask.SendDataToNetwork("setOffLight"+'\n');
 				}
 			}
 			else{
@@ -185,13 +184,13 @@ public class AcquirementActivity extends Activity {
 				editor.putBoolean("btnTemp", btnTemp.isChecked());
 				editor.commit();
 
-				if(!btnTemp.isChecked()){
+				if(btnTemp.isChecked()){
 					//Button is OFF, turn ON and send the command to Arduino
-					networktask.SendDataToNetwork("setOn");
+					networktask.SendDataToNetwork("setOnTemp"+'\n');
 				}
 				else{
 					//Button is ON, turn OFF and send the command to Arduino
-					networktask.SendDataToNetwork("setOff");
+					networktask.SendDataToNetwork("setOffTemp"+'\n');
 				}
 			}
 			else{
@@ -207,7 +206,8 @@ public class AcquirementActivity extends Activity {
 			//Checks if the sensor is ON
 			if(btnTemp.isChecked()){
 				//Command to update de temperature value
-				networktask.SendDataToNetwork("tempValue");
+				networktask.SendDataToNetwork("tempValue"+'\n');
+				//+'\n'
 			}
 			else{
 				Toast.makeText(AcquirementActivity.this, "Please, turn ON the temperature sensor", Toast.LENGTH_LONG).show();
@@ -258,10 +258,10 @@ public class AcquirementActivity extends Activity {
 			boolean result = false;
 			try {
 				//create a new socket instance
-				SocketAddress sockaddr = new InetSocketAddress("192.168.0.1", 8888); //MUDAR IP!!!
+				SocketAddress sockaddr = new InetSocketAddress("192.168.0.106", 5000); //MUDAR IP!!!
 				nsocket = new Socket();
 				//connect and set a 10 second connection timeout
-				nsocket.connect(sockaddr, 5000);
+				nsocket.connect(sockaddr,10000);
 				if (nsocket.isConnected()) {
 					nis = nsocket.getInputStream();
 					nos = nsocket.getOutputStream();
@@ -319,6 +319,7 @@ public class AcquirementActivity extends Activity {
 		//Methods is called everytime a new String is recieved from the socket connection
 		@Override
 		protected void onProgressUpdate(byte[]... values) {
+			//Log.d(TAG,"2. ReceiveDataFromNetwork!");
 			//if the recieved data is at least one byte
 			if (values.length > 0) {
 				//get the String from the recieved bytes
