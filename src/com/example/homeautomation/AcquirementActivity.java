@@ -113,7 +113,10 @@ public class AcquirementActivity extends Activity {
 				}
 			}
 			else{
-				btnMove.setChecked(false);
+				//Restored value
+				SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+				boolean move = preferences.getBoolean("btnMove", false);
+				btnMove.setChecked(move);
 				Toast.makeText(AcquirementActivity.this, "Please, connect to the server.", Toast.LENGTH_LONG).show();
 			}
 		}
@@ -140,7 +143,10 @@ public class AcquirementActivity extends Activity {
 				}
 			}
 			else{
-				btnGas.setChecked(false);
+				//Restored value
+				SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+				boolean gas = preferences.getBoolean("btnGas", false);
+				btnGas.setChecked(gas);
 				Toast.makeText(AcquirementActivity.this, "Please, connect to the server.", Toast.LENGTH_LONG).show();
 			}
 		}
@@ -167,7 +173,10 @@ public class AcquirementActivity extends Activity {
 				}
 			}
 			else{
-				btnLight.setChecked(false);
+				//Restored value
+				SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+				boolean light = preferences.getBoolean("btnLight", false);
+				btnLight.setChecked(light);
 				Toast.makeText(AcquirementActivity.this, "Please, connect to the server.", Toast.LENGTH_LONG).show();
 			}
 		}
@@ -194,7 +203,10 @@ public class AcquirementActivity extends Activity {
 				}
 			}
 			else{
-				btnTemp.setChecked(false);
+				//Restored value
+				SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+				boolean temp = preferences.getBoolean("btnTemp", false);
+				btnTemp.setChecked(temp);
 				Toast.makeText(AcquirementActivity.this, "Please, connect to the server.", Toast.LENGTH_LONG).show();
 			}
 		}
