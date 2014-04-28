@@ -1,9 +1,12 @@
 package com.example.homeautomation;
 
 import com.example.homeautomation.R;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.View;
@@ -25,6 +28,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	// Services.
 	private WifiManager wifiManager;
+	private ConnectivityManager connManager;
+	private NetworkInfo wifiState;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +51,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	 * Initialize all services.
 	 */
 	private void initializeServices() {		
-		// WIFI service manager.
+		// WIFI and Network service manager.
 		this.wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+		this.connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+	    this.wifiState = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 	}
 	
 	/**
@@ -68,8 +75,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				//Wi-Fi state (On or Off)
 				if(this.wifiManager.isWifiEnabled()){	
 					//if enable, start the new activity
-					final Intent intent = new Intent(this, AcquirementActivity.class);
-					this.startActivity(intent);
+					if(this.wifiState.isConnected()){
+						final Intent intent = new Intent(this, AcquirementActivity.class);
+						this.startActivity(intent);
+					}
+					else{
+						// Display message.
+				    	Toast.makeText(MainActivity.context, "Please, WIFI is not connected.", Toast.LENGTH_LONG).show();
+					}
 				}
 				else{
 					// Display message.
