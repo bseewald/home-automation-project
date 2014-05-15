@@ -35,6 +35,8 @@ const byte remoteATOptionApplyChanges = 0x02;
 
 //BUZZER
 #define BUZZER 2
+//LED VERDE
+#define LED 8
 
 void setup(void) {
   
@@ -97,6 +99,7 @@ void setup(void) {
   //Serial.println(F("Waiting..."));
   
   pinMode(BUZZER,OUTPUT);
+  pinMode(LED,OUTPUT);
 }  
 
 void loop(void)
@@ -111,15 +114,8 @@ void loop(void)
     while (client.connected()) {
       
       //Client connected
-      //Xbee communication
-      if(Serial1.available()){
-        for(int i=0; i<22; i++){
-          Serial.print(Serial1.read(),HEX);
-          Serial.print(",");
-        }
-        //if(Serial.read() == 7E){
-        Serial.println();    
-      } 
+      readSerial();
+      //xbeePacket();
             
       //if client is sending
       if (client.available()) {
@@ -136,64 +132,64 @@ void loop(void)
           //if the command begins with "set..."
           if(commandStr.indexOf("setOnMove")==0){
             //Set the xbee module (XBEE 2)
-            toogleRemotePin(1,0x40,0x8B,0xAE,0x6A);
-            toogleRemotePinMove(1,0x40,0x8B,0xAE,0x6A);
+            toggleRemotePin(1,0x40,0x8B,0xAE,0x6A);
+            toggleRemotePinMove(1,0x40,0x8B,0xAE,0x6A);
             //Buzzer for On
             setBuzzer(1);
           }
           if(commandStr.indexOf("setOffMove")==0){
             //Set the xbee module (XBEE 2)
-            toogleRemotePin(0,0x40,0x8B,0xAE,0x6A);
-            toogleRemotePinMove(0,0x40,0x8B,0xAE,0x6A);
+            toggleRemotePin(0,0x40,0x8B,0xAE,0x6A);
+            toggleRemotePinMove(0,0x40,0x8B,0xAE,0x6A);
             //Buzzer for Off
             setBuzzer(0);
           }
           if(commandStr.indexOf("setOnGas")==0){
             //Set the xbee module (XBEE 1)
             toogleRemotePin(1,0x40,0xB0,0x9D,0x68);
-            //toogleRemotePinGasLight(1,0x40,0xB0,0x9D,0x68);
+            toggleRemotePinGas(1,0x40,0xB0,0x9D,0x68);
             //Buzzer for On
             setBuzzer(1);
           }
           if(commandStr.indexOf("setOffGas")==0){
             //Set the xbee module (XBEE 1)
-            toogleRemotePin(0,0x40,0xB0,0x9D,0x68);
-            //toogleRemotePinGasLight(0,0x40,0xB0,0x9D,0x68);
+            toggleRemotePin(0,0x40,0xB0,0x9D,0x68);
+            toggleRemotePinGas(0,0x40,0xB0,0x9D,0x68);
             //Buzzer for Off
             setBuzzer(0);
           }
           if(commandStr.indexOf("setOnLight")==0){
             //Set the xbee module (XBEE 2)
-            toogleRemotePin(1,0x40,0x8B,0xAE,0x6A);
-            //toogleRemotePinGasLight(1,0x40,0x8B,0xAE,0x6A);
+            toggleRemotePin(1,0x40,0x8B,0xAE,0x6A);
+            toggleRemotePinLight(1,0x40,0x8B,0xAE,0x6A);
             //Buzzer for On
             setBuzzer(1);
           }
           if(commandStr.indexOf("setOffLight")==0){
             //Set the xbee module (XBEE 2)
-            toogleRemotePin(0,0x40,0x8B,0xAE,0x6A);
-            //toogleRemotePinGasLight(0,0x40,0x8B,0xAE,0x6A);
+            toggleRemotePin(0,0x40,0x8B,0xAE,0x6A);
+            toggleRemotePinLight(0,0x40,0x8B,0xAE,0x6A);
             //Buzzer for Off
             setBuzzer(0);
           }
           if(commandStr.indexOf("setOnTemp")==0){
             //Set the xbee module (XBEE 1)
-            toogleRemotePin(1,0x40,0xB0,0x9D,0x68);
-            //toogleRemotePinTemp(1,0x40,0xB0,0x9D,0x68);
+            toggleRemotePin(1,0x40,0xB0,0x9D,0x68);
+            toggleRemotePinTemp(1,0x40,0xB0,0x9D,0x68);
             //Buzzer for On
             setBuzzer(1);
           }
           if(commandStr.indexOf("setOffTemp")==0){
             //Set the xbee module (XBEE 1)
-            toogleRemotePin(0,0x40,0xB0,0x9D,0x68);
-            //toogleRemotePinTemp(0,0x40,0xB0,0x9D,0x68);
+            toggleRemotePin(0,0x40,0xB0,0x9D,0x68);
+            toggleRemotePinTemp(0,0x40,0xB0,0x9D,0x68);
             //Buzzer for Off
             setBuzzer(0);           
           }
           if(commandStr.indexOf("tempValue")==0){
             //Fake command
-            chatServer.println("setTempValue:25");
-            //TODO: set the xbee module
+            //chatServer.println("setTempValue:25");
+            queriedSample(0x40,0xB0,0x9D,0x68);
           }          
                     
           //reset the commandline String
@@ -208,24 +204,17 @@ void loop(void)
   }
   
   //Client not connected
-  //Xbee communication
-  if(Serial1.available()){
-    for(int i=0; i<22; i++){
-    //if(Serial.read() == 7E){
-      Serial.print(Serial1.read(),HEX);
-      Serial.print(",");
-    }
-    Serial.println();    
-  }  
+  readSerial();
+  //xbeePacket();
   
 }
 
 byte sendByte(byte value){
-  Serial1.write(value); //VERIFICAR SERIAL!!! 
+  Serial1.write(value);  
   return value;  
 }
 
-void toogleRemotePin(int value, byte sensorAddress0, byte sensorAddress1, 
+void toggleRemotePin(int value, byte sensorAddress0, byte sensorAddress1, 
                      byte sensorAddress2, byte sensorAddress3){
   
   byte pin_state;
@@ -340,12 +329,12 @@ void toogleRemotePin(int value, byte sensorAddress0, byte sensorAddress1,
   }   
 }
 
-void toogleRemotePinMove(int value, byte sensorAddress0, byte sensorAddress1, 
+void toggleRemotePinMove(int value, byte sensorAddress0, byte sensorAddress1, 
                      byte sensorAddress2, byte sensorAddress3){
 
   if(value){
     
-    Serial.println("set sensor ON");
+    Serial.println("set MOVE sensor ON");
     //////////////////////////////////   
     // Packet 2 - SENSOR
     sendByte(frameStartByte);  
@@ -429,7 +418,7 @@ void toogleRemotePinMove(int value, byte sensorAddress0, byte sensorAddress1,
   }
   else{
     
-    Serial.println("set sensor OFF");
+    Serial.println("set MOVE sensor OFF");
     //////////////////////////////////   
     // Packet 2 - SENSOR
     sendByte(frameStartByte);  
@@ -472,31 +461,562 @@ void toogleRemotePinMove(int value, byte sensorAddress0, byte sensorAddress1,
   }  
 }
 
-/*
-void toogleRemotePinGasLight(int value, byte sensorAddress0, byte sensorAddress1, 
+
+void toggleRemotePinGas(int value, byte sensorAddress0, byte sensorAddress1, 
                      byte sensorAddress2, byte sensorAddress3){
   
   if(value){
+    
+    Serial.println("set GAS sensor ON");
+    //////////////////////////////////   
+    // Packet 2 - SENSOR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    long sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
   
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
+
+    // The text of the AT command 
+    sum += sendByte('D');
+    sum += sendByte('0');
+
+    // The value (0x02 for analog, 0x0 for disable) 
+    sum += sendByte(0x02);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the sensor settle down 
+    delay(10);
+    
+    ///////////////////////////////
+    //Packet 3 - IR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
+  
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
+
+    // The text of the AT command 
+    sum += sendByte('I');
+    sum += sendByte('R');
+    
+    // The value (0xEA60 for 60s, 0x7530 for 30s, 0x2710 for 10s) 
+    sum += sendByte(0x2710);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the microcontroller settle down if needed
+    delay(10);
   }
   else{
+    
+    Serial.println("set GAS sensor OFF");
+    //////////////////////////////////   
+    // Packet 2 - SENSOR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    long sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
   
-  }
-  delay(10);  
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
+
+    // The text of the AT command 
+    sum += sendByte('D');
+    sum += sendByte('0');
+
+    // The value (0x02 analog, 0x0 for disable) 
+    sum += sendByte(0x0);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the microcontroller settle down if needed
+    delay(10);
+    
+    ///////////////////////////////
+    //Packet 3 - IR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
+  
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
+
+    // The text of the AT command 
+    sum += sendByte('I');
+    sum += sendByte('R');
+    
+    // The value (0xEA60 for 60s, 0x7530 for 30s, 0x2710 for 10s) 
+    sum += sendByte(0x0);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the microcontroller settle down if needed
+    delay(10);
+  }  
 }
 
-void toogleRemotePinTemp(int value, byte sensorAddress0, byte sensorAddress1, 
+
+void toggleRemotePinLight(int value, byte sensorAddress0, byte sensorAddress1, 
+                     byte sensorAddress2, byte sensorAddress3){
+  
+  if(value){
+    
+    Serial.println("set LIGHT sensor ON");
+    //////////////////////////////////   
+    // Packet 2 - SENSOR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    long sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
+  
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
+
+    // The text of the AT command 
+    sum += sendByte('D');
+    sum += sendByte('2');
+
+    // The value (0x02 for analog, 0x0 for disable) 
+    sum += sendByte(0x02);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the sensor settle down 
+    delay(10);
+    
+    ///////////////////////////////
+    //Packet 3 - IR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
+  
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
+
+    // The text of the AT command 
+    sum += sendByte('I');
+    sum += sendByte('R');
+    
+    // The value (0xEA60 for 60s, 0x7530 for 30s, 0x2710 for 10s) 
+    sum += sendByte(0x2710);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the microcontroller settle down if needed
+    delay(10);
+  }
+  else{
+    
+    Serial.println("set LIGHT sensor OFF");
+    //////////////////////////////////   
+    // Packet 2 - SENSOR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    long sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
+  
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
+
+    // The text of the AT command 
+    sum += sendByte('D');
+    sum += sendByte('2');
+
+    // The value (0x03 for digital input, 0x0 for disable) 
+    sum += sendByte(0x0);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the microcontroller settle down if needed
+    delay(10);
+    
+    ///////////////////////////////
+    //Packet 3 - IR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
+  
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
+
+    // The text of the AT command 
+    sum += sendByte('I');
+    sum += sendByte('R');
+    
+    // The value (0xEA60 for 60s, 0x7530 for 30s, 0x2710 for 10s) 
+    sum += sendByte(0x0);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the microcontroller settle down if needed
+    delay(10);
+  }  
+}
+
+void toggleRemotePinTemp(int value, byte sensorAddress0, byte sensorAddress1, 
                      byte sensorAddress2, byte sensorAddress3){
   
   if(value){
   
+    Serial.println("set TEMPERATURE sensor ON");
+    //////////////////////////////////   
+    // Packet 2 - SENSOR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    long sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
+  
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
+
+    // The text of the AT command 
+    sum += sendByte('D');
+    sum += sendByte('3');
+
+    // The value (0x02 for analog, 0x0 for disable) 
+    sum += sendByte(0x02);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the sensor settle down 
+    delay(10);
   }
   else{
   
-  }
-  delay(10);  
+    Serial.println("set TEMPERATURE sensor OFF");
+    //////////////////////////////////   
+    // Packet 2 - SENSOR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    long sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
+  
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
+
+    // The text of the AT command 
+    sum += sendByte('D');
+    sum += sendByte('3');
+
+    // The value (0x03 for digital input, 0x0 for disable) 
+    sum += sendByte(0x0);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the microcontroller settle down if needed
+    delay(10);  
+  } 
 }
-*/
+
+void queriedSample(byte sensorAddress0, byte sensorAddress1, 
+                     byte sensorAddress2, byte sensorAddress3){
+               
+    Serial.println("TEMPERATURE sensor DATA");
+    //////////////////////////////////   
+    // Packet 1 - SENSOR
+    sendByte(frameStartByte);  
+    sendByte(0x0);
+    sendByte(0x10);
+    
+    long sum = 0; 
+
+    sum += sendByte(frameTypeRemoteAT);
+    sum += sendByte(0x0); 
+    // DH: 0x0013A200 
+    sum += sendByte(0x0);
+    sum += sendByte(0x13);
+    sum += sendByte(0xA2); 
+    sum += sendByte(0x0); 
+    // DL: Depends on the sensor
+    sum += sendByte(sensorAddress0); 
+    sum += sendByte(sensorAddress1); 
+    sum += sendByte(sensorAddress2); 
+    sum += sendByte(sensorAddress3);
+
+    sum += sendByte(0xFF);
+    sum += sendByte(0xFE);
+
+    //Remote Command Options
+    sum += sendByte(0x0);
+    
+    // The value (0x4953 for IS command) 
+    sum += sendByte(0x4953);
+  
+    // Send the checksum
+    sendByte( 0xFF - ( sum & 0xFF));
+
+    // Pause to let the microcontroller settle down if needed
+    delay(10);  
+}  
+
+void xbeePacket(void){
+  
+  //Xbee communication
+  if(Serial1.available() > 21){
+    //Start byte
+    if(Serial1.read() == 0x7E){
+      for(int i=0; i<16; i++){ //Reads until first byte of digital channel mask
+        byte discardByte = Serial1.read();
+      }
+      
+      //////////////////////////////////
+      //SENSOR DATA
+      
+      //Digital sample data - Move sensor
+      if(Serial1.read() == 0x12){ //Second byte of digital channel mask
+        byte discardByte = Serial1.read();
+        byte discardByte = Serial1.read();
+        if(Serial1.read() == 0x12){ //Reads second byte of digital sample data
+          //Alarm => 20s
+          setAlarm();
+          //TODO: button option to turn OFF the alarm  
+        }
+      } 
+      /*
+      if(Serial1.read() == 0x01 ){ //Analog channel mask - Gas sensor
+        int analogMSB = Serial1.read();
+        int analogLSB = Serial1.read();
+        int analogGasValue = analogLSB + (analogMSB * 256);
+        
+        if(analogGasValue > ){ 
+          //Gas leakage - Alarm!
+          setAlarm();
+        }        
+        //TODO: different alarms for different values of gas -> what type of gas it is. 
+      }  
+      else if(Serial1.read() == 0x04){ //Light sensor
+        int analogMSB = Serial1.read();
+        int analogLSB = Serial1.read();
+        int analogLightValue = analogLSB + (analogMSB * 256);
+        
+        if(analogLightValue > 0 && analogLightValue <= 350 ){
+          Serial.println("Too dark!");
+          digitalWrite(LED,HIGH);
+        }
+        if(analogLightValue > 350  && analogLightValue <= 750){
+          Serial.println("Perfect for romance..");
+          digitalWrite(LED,LOW);
+        }  
+        if(analogLightValue > 750 && analogLightValue <= 1023){
+          Serial.println("No need for more light.");
+          digitalWrite(LED,HIGH);
+        }  
+        
+        //TODO: use the information from the light sensor 
+        //OPTION 1: turn ON/OFF the lights       
+      }
+      else if(Serial1.read() == 0x08){ //Temp sensor
+        int analogMSB = Serial1.read();
+        int analogLSB = Serial1.read();
+        int analogLTempValue = analogLSB + (analogMSB * 256);
+        
+        float celcius = (analogTempValue/1023)*1230;
+        chatServer.println("setTempValue:"+String(celcius));
+      }  
+      */
+    }    
+  } 
+} 
+
+void readSerial(void){
+  
+  //Xbee communication
+  if(Serial1.available()){
+    for(int i=0; i<22; i++){
+      Serial.print(Serial1.read(),HEX);
+      Serial.print(",");
+    }
+    Serial.println();    
+  }   
+}
 
 void setBuzzer(int buzzerState){
   
@@ -517,6 +1037,25 @@ void setBuzzer(int buzzerState){
     analogWrite(BUZZER,0);
   }  
 }
+
+void setAlarm(void){
+  
+  float sinVal;
+  int toneVal;
+  
+  for(int j=0; j<50; j++){
+    for(int i=0; i<180; i++){
+      //Convert degrees to radians
+      sinVal = (sin(i*(3.1412/180))); 
+    
+      //Generate frequency
+      toneVal = 2000+(int(sinVal*1000));
+      tone(BUZZER,toneVal);
+      delay(2);
+    }  
+  }
+  noTone(BUZZER);
+}  
 
 /**************************************************************************/
 /*!
