@@ -20,8 +20,8 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
 //WI-FI CONFIGURATION
 //#define WLAN_SSID       "fsilva"             
 //#define WLAN_PASS       "bru2465betinharml"
-#define WLAN_SSID       "ALLBAGS"             
-#define WLAN_PASS       "allbags300"
+#define WLAN_SSID       "Net_906"             
+#define WLAN_PASS       "claudia2113"
 #define WLAN_SECURITY   WLAN_SEC_WPA2
 
 //SERVER
@@ -114,8 +114,8 @@ void loop(void)
     while (client.connected()) {
       
       //Client connected
-      readSerial();
-      //xbeePacket();
+      //readSerial();
+      xbeePacket();
             
       //if client is sending
       if (client.available()) {
@@ -159,37 +159,35 @@ void loop(void)
             setBuzzer(0);
           }
           if(commandStr.indexOf("setOnLight")==0){
-            //Set the xbee module (XBEE 2)
-            toggleRemotePin(1,0x40,0x8B,0xAE,0x6A);
-            toggleRemotePinLight(1,0x40,0x8B,0xAE,0x6A);
+            //Set the xbee module (XBEE 1)
+            toggleRemotePin(1,0x40,0xB0,0x9D,0x68);
+            toggleRemotePinLight(1,0x40,0xB0,0x9D,0x68);
             //Buzzer for On
             setBuzzer(1);
           }
           if(commandStr.indexOf("setOffLight")==0){
-            //Set the xbee module (XBEE 2)
-            toggleRemotePin(0,0x40,0x8B,0xAE,0x6A);
-            toggleRemotePinLight(0,0x40,0x8B,0xAE,0x6A);
+            //Set the xbee module (XBEE 1)
+            toggleRemotePin(0,0x40,0xB0,0x9D,0x68);
+            toggleRemotePinLight(0,0x40,0xB0,0x9D,0x68);
             //Buzzer for Off
             setBuzzer(0);
           }
           if(commandStr.indexOf("setOnTemp")==0){
-            //Set the xbee module (XBEE 2)
-            toggleRemotePin(1,0x40,0x8B,0xAE,0x6A);
-            toggleRemotePinTemp(1,0x40,0x8B,0xAE,0x6A);
+            //Set the xbee module (XBEE 1)
+            toggleRemotePin(1,0x40,0xB0,0x9D,0x68);
+            toggleRemotePinTemp(1,0x40,0xB0,0x9D,0x68);
             //Buzzer for On
             setBuzzer(1);
           }
           if(commandStr.indexOf("setOffTemp")==0){
-            //Set the xbee module (XBEE 2)
-            toggleRemotePin(0,0x40,0x8B,0xAE,0x6A);
-            toggleRemotePinTemp(0,0x40,0x8B,0xAE,0x6A);
+            //Set the xbee module (XBEE 1)
+            toggleRemotePin(0,0x40,0xB0,0x9D,0x68);
+            toggleRemotePinTemp(0,0x40,0xB0,0x9D,0x68);
             //Buzzer for Off
             setBuzzer(0);           
           }
           if(commandStr.indexOf("tempValue")==0){
-            //Fake command
-            //chatServer.println("setTempValue:25");
-            queriedSample(0x40,0x8B,0xAE,0x6A);
+            queriedSample(0x40,0xB0,0x9D,0x68);
           }          
                     
           //reset the commandline String
@@ -204,8 +202,8 @@ void loop(void)
   }
   
   //Client not connected
-  readSerial();
-  //xbeePacket();
+  //readSerial();
+  xbeePacket();
   
 }
 
@@ -911,7 +909,7 @@ void queriedSample(byte sensorAddress0, byte sensorAddress1,
     long sum = 0; 
 
     sum += sendByte(frameTypeRemoteAT);
-    sum += sendByte(0x0); 
+    sum += sendByte(0x01); 
     // DH: 0x0013A200 
     sum += sendByte(0x0);
     sum += sendByte(0x13);
@@ -926,8 +924,8 @@ void queriedSample(byte sensorAddress0, byte sensorAddress1,
     sum += sendByte(0xFF);
     sum += sendByte(0xFE);
 
-    //Remote Command Options
-    sum += sendByte(0x0);
+    // Send Remote AT options
+    sum += sendByte(remoteATOptionApplyChanges); 
     
     // The value (0x4953 for IS command) 
     sum += sendByte('I');
@@ -937,10 +935,12 @@ void queriedSample(byte sensorAddress0, byte sensorAddress1,
     sendByte( 0xFF - ( sum & 0xFF));
 
     // Pause to let the microcontroller settle down if needed
-    delay(10);  
+    delay(1000);  
 }  
 
 void xbeePacket(void){
+  
+  int queriedPacket = 0;
   
   //Xbee communication
   if(Serial1.available() > 21){
@@ -948,11 +948,13 @@ void xbeePacket(void){
     if(Serial1.read() == 0x7E){
       for(int i=0; i<16; i++){ //Reads until first byte of digital channel mask
         byte discardByte = Serial1.read();
+        if(discardByte == 0x53){ queriedPacket = 1; }
       }
       
       //////////////////////////////////
       //SENSOR DATA
       
+     if(!queriedPacket){ 
       //Digital sample data - Move sensor
       if(Serial1.read() == 0x12){ //Second byte of digital channel mask
         byte discardByte = Serial1.read();
@@ -1005,16 +1007,30 @@ void xbeePacket(void){
         
         //TODO: use the information from the light sensor 
         //OPTION 1: turn ON/OFF the lights       
-      } /*
-      else if(aux == 0x08){ //Temp sensor
+      } 
+     }
+     else{ 
+      //QUERIED SAMPLE PACKET
+      for(int i=0; i < 4; i++){ 
+        byte discardByte = Serial1.read();
+      }  
+      
+      if(Serial1.read() == 0x08){ //Temp sensor
+      
+        byte discardByte = Serial1.read(); //2 bytes of digital data 
+             discardByte = Serial1.read();
+             
         int analogMSB = Serial1.read();
         int analogLSB = Serial1.read();
-        int analogLTempValue = analogLSB + (analogMSB * 256);
+        int analogTempValue = analogLSB + (analogMSB * 256);
+        Serial.println(analogTempValue); 
         
-        float celcius = (analogTempValue/1023)*1230;
-        chatServer.println("setTempValue:"+String(celcius));
+        float celcius = ((analogTempValue/1023.0)*1230)/10.0;
+        //Serial.print(celcius);
+        //Serial.println("˚C"); 
+        chatServer.println("setTempValue:"+String((int)celcius));
       }  
-      */
+     } 
     }    
   } 
 } 
@@ -1025,7 +1041,7 @@ void readSerial(void){
   if(Serial1.available() >= 21){
     if(Serial1.read() == 0x7E){
       Serial.print("7E,");
-      for(int i=0; i<23; i++){
+      for(int i=0; i<26; i++){
         Serial.print(Serial1.read(),HEX);
         Serial.print(",");
       }
