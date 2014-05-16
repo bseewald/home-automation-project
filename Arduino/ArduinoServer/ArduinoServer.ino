@@ -146,7 +146,7 @@ void loop(void)
           }
           if(commandStr.indexOf("setOnGas")==0){
             //Set the xbee module (XBEE 1)
-            toogleRemotePin(1,0x40,0xB0,0x9D,0x68);
+            toggleRemotePin(1,0x40,0xB0,0x9D,0x68);
             toggleRemotePinGas(1,0x40,0xB0,0x9D,0x68);
             //Buzzer for On
             setBuzzer(1);
@@ -173,23 +173,23 @@ void loop(void)
             setBuzzer(0);
           }
           if(commandStr.indexOf("setOnTemp")==0){
-            //Set the xbee module (XBEE 1)
-            toggleRemotePin(1,0x40,0xB0,0x9D,0x68);
-            toggleRemotePinTemp(1,0x40,0xB0,0x9D,0x68);
+            //Set the xbee module (XBEE 2)
+            toggleRemotePin(1,0x40,0x8B,0xAE,0x6A);
+            toggleRemotePinTemp(1,0x40,0x8B,0xAE,0x6A);
             //Buzzer for On
             setBuzzer(1);
           }
           if(commandStr.indexOf("setOffTemp")==0){
-            //Set the xbee module (XBEE 1)
-            toggleRemotePin(0,0x40,0xB0,0x9D,0x68);
-            toggleRemotePinTemp(0,0x40,0xB0,0x9D,0x68);
+            //Set the xbee module (XBEE 2)
+            toggleRemotePin(0,0x40,0x8B,0xAE,0x6A);
+            toggleRemotePinTemp(0,0x40,0x8B,0xAE,0x6A);
             //Buzzer for Off
             setBuzzer(0);           
           }
           if(commandStr.indexOf("tempValue")==0){
             //Fake command
             //chatServer.println("setTempValue:25");
-            queriedSample(0x40,0xB0,0x9D,0x68);
+            queriedSample(0x40,0x8B,0xAE,0x6A);
           }          
                     
           //reset the commandline String
@@ -512,7 +512,7 @@ void toggleRemotePinGas(int value, byte sensorAddress0, byte sensorAddress1,
     //Packet 3 - IR
     sendByte(frameStartByte);  
     sendByte(0x0);
-    sendByte(0x10);
+    sendByte(0x11);
     
     sum = 0; 
 
@@ -540,7 +540,8 @@ void toggleRemotePinGas(int value, byte sensorAddress0, byte sensorAddress1,
     sum += sendByte('R');
     
     // The value (0xEA60 for 60s, 0x7530 for 30s, 0x2710 for 10s) 
-    sum += sendByte(0x2710);
+    sum += sendByte(0x27);
+    sum += sendByte(0x10);
   
     // Send the checksum
     sendByte( 0xFF - ( sum & 0xFF));
@@ -684,7 +685,7 @@ void toggleRemotePinLight(int value, byte sensorAddress0, byte sensorAddress1,
     //Packet 3 - IR
     sendByte(frameStartByte);  
     sendByte(0x0);
-    sendByte(0x10);
+    sendByte(0x11);
     
     sum = 0; 
 
@@ -712,7 +713,8 @@ void toggleRemotePinLight(int value, byte sensorAddress0, byte sensorAddress1,
     sum += sendByte('R');
     
     // The value (0xEA60 for 60s, 0x7530 for 30s, 0x2710 for 10s) 
-    sum += sendByte(0x2710);
+    sum += sendByte(0x27);
+    sum += sendByte(0x10);
   
     // Send the checksum
     sendByte( 0xFF - ( sum & 0xFF));
@@ -885,7 +887,7 @@ void toggleRemotePinTemp(int value, byte sensorAddress0, byte sensorAddress1,
     sum += sendByte('D');
     sum += sendByte('3');
 
-    // The value (0x03 for digital input, 0x0 for disable) 
+    // The value (0x02 for analog, 0x0 for disable) 
     sum += sendByte(0x0);
   
     // Send the checksum
@@ -904,7 +906,7 @@ void queriedSample(byte sensorAddress0, byte sensorAddress1,
     // Packet 1 - SENSOR
     sendByte(frameStartByte);  
     sendByte(0x0);
-    sendByte(0x10);
+    sendByte(0x0F);
     
     long sum = 0; 
 
@@ -928,7 +930,8 @@ void queriedSample(byte sensorAddress0, byte sensorAddress1,
     sum += sendByte(0x0);
     
     // The value (0x4953 for IS command) 
-    sum += sendByte(0x4953);
+    sum += sendByte('I');
+    sum += sendByte('S');
   
     // Send the checksum
     sendByte( 0xFF - ( sum & 0xFF));
@@ -953,32 +956,42 @@ void xbeePacket(void){
       //Digital sample data - Move sensor
       if(Serial1.read() == 0x12){ //Second byte of digital channel mask
         byte discardByte = Serial1.read();
-        byte discardByte = Serial1.read();
+        discardByte = Serial1.read();
         if(Serial1.read() == 0x12){ //Reads second byte of digital sample data
           //Alarm => 20s
           setAlarm();
           //TODO: button option to turn OFF the alarm  
         }
       } 
-      /*
-      if(Serial1.read() == 0x01 ){ //Analog channel mask - Gas sensor
+      byte aux = Serial1.read();
+      if(aux == 0x01 ){ //Analog channel mask - Gas sensor
+      
+        byte discardByte = Serial1.read(); //2 bytes of digital data 
+             discardByte = Serial1.read();
+             
         int analogMSB = Serial1.read();
         int analogLSB = Serial1.read();
         int analogGasValue = analogLSB + (analogMSB * 256);
+        //Serial.println(analogGasValue);
         
-        if(analogGasValue > ){ 
+        if(analogGasValue > 200){ //TESTAR COM GAS DE COZINHA!!!
           //Gas leakage - Alarm!
           setAlarm();
         }        
         //TODO: different alarms for different values of gas -> what type of gas it is. 
       }  
-      else if(Serial1.read() == 0x04){ //Light sensor
+      else if(aux == 0x04){ //Light sensor
+      
+        byte discardByte = Serial1.read(); //2 bytes of digital data 
+             discardByte = Serial1.read();
+             
         int analogMSB = Serial1.read();
         int analogLSB = Serial1.read();
         int analogLightValue = analogLSB + (analogMSB * 256);
+        //Serial.println(analogLightValue); 
         
         if(analogLightValue > 0 && analogLightValue <= 350 ){
-          Serial.println("Too dark!");
+          Serial.println("No need for more light.");
           digitalWrite(LED,HIGH);
         }
         if(analogLightValue > 350  && analogLightValue <= 750){
@@ -986,14 +999,14 @@ void xbeePacket(void){
           digitalWrite(LED,LOW);
         }  
         if(analogLightValue > 750 && analogLightValue <= 1023){
-          Serial.println("No need for more light.");
+          Serial.println("Too dark!");
           digitalWrite(LED,HIGH);
         }  
         
         //TODO: use the information from the light sensor 
         //OPTION 1: turn ON/OFF the lights       
-      }
-      else if(Serial1.read() == 0x08){ //Temp sensor
+      } /*
+      else if(aux == 0x08){ //Temp sensor
         int analogMSB = Serial1.read();
         int analogLSB = Serial1.read();
         int analogLTempValue = analogLSB + (analogMSB * 256);
@@ -1009,11 +1022,14 @@ void xbeePacket(void){
 void readSerial(void){
   
   //Xbee communication
-  if(Serial1.available()){
-    for(int i=0; i<22; i++){
-      Serial.print(Serial1.read(),HEX);
-      Serial.print(",");
-    }
+  if(Serial1.available() >= 21){
+    if(Serial1.read() == 0x7E){
+      Serial.print("7E,");
+      for(int i=0; i<23; i++){
+        Serial.print(Serial1.read(),HEX);
+        Serial.print(",");
+      }
+    }    
     Serial.println();    
   }   
 }
