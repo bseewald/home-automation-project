@@ -71,7 +71,7 @@ void setup(void) {
 #endif
 */
 
-/*  
+  
   // Optional setting a static IP Address 
   unsigned long IPAdd[1] = {0x6A00A8C0};       //192.168.0.106
   unsigned long SubNetMask[1] = {0x00FFFFFF};  //225.255.255.0
@@ -89,7 +89,7 @@ void setup(void) {
     while(true);
   }    
   // End setting static IP Address
-*/
+
   
   if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
     Serial.println(F("Failed!"));
@@ -141,7 +141,7 @@ void loop(void)
         //if a newline character is sent (command line is fully recieved)
         if (c == '\n') {
           //output the command
-          Serial.println("Command:"+commandStr);
+          Serial.print("Command:"+commandStr);
           
           //if the command begins with "set..."
           if(commandStr.indexOf("setOnMove")==0){
@@ -584,8 +584,8 @@ void toggleRemotePinGas(int value, byte sensorAddress0, byte sensorAddress1,
     sum += sendByte('R');
     
     // The value (0xEA60 for 60s, 0x7530 for 30s, 0x2710 for 10s) 
-    sum += sendByte(0xEA);
-    sum += sendByte(0x60);
+    sum += sendByte(0x27);
+    sum += sendByte(0x10);
   
     // Send the checksum
     sendByte( 0xFF - ( sum & 0xFF));
@@ -1028,11 +1028,11 @@ void xbeePacket(void){
         //Serial.println(analogGasValue);
         
         //Send data to carriots service
-        sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(GAS_DEVICE)+"\",\"at\":\"now\",\"data\":{\"GasSensor\":\"ON\",\"Value\":"+String(analogGasValue)+"}}";
-        sensorDataLength = sensorData.length();
-        sendData(sensorData,sensorDataLength);
+        //sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(GAS_DEVICE)+"\",\"at\":\"now\",\"data\":{\"GasSensor\":\"ON\",\"Value\":"+String(analogGasValue)+"}}";
+        //sensorDataLength = sensorData.length();
+        //sendData(sensorData,sensorDataLength);
         
-        if(analogGasValue > 200){ //TESTAR COM GAS DE COZINHA!!!
+        if(analogGasValue > 900){ 
           //Gas leakage - Alarm!
           setAlarm();
           
@@ -1041,7 +1041,8 @@ void xbeePacket(void){
           sensorDataLength = sensorData.length();
           sendData(sensorData,sensorDataLength);
         }        
-        //TODO: different alarms for different values of gas -> what type of gas it is. 
+        //TODO: different alarms for different values of gas -> what type of gas it is.
+       */ 
       }  
       else if(aux == 0x04){ //Light sensor
       
@@ -1058,27 +1059,27 @@ void xbeePacket(void){
           digitalWrite(LED,HIGH);
           
           //Send data to carriots service
-          sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"No need for more light.\",\"Value\":"+String(analogLightValue)+"}}";
-          sensorDataLength = sensorData.length();
-          sendData(sensorData,sensorDataLength);
+          //sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"No need for more light.\",\"Value\":"+String(analogLightValue)+"}}";
+          //sensorDataLength = sensorData.length();
+          //sendData(sensorData,sensorDataLength);
         }
         if(analogLightValue > 350  && analogLightValue <= 750){
           Serial.println("Perfect for a date.");
           digitalWrite(LED,LOW);
           
           //Send data to carriots service
-          sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"Perfect for a date.\",\"Value\":"+String(analogLightValue)+"}}";
-          sensorDataLength = sensorData.length();
-          sendData(sensorData,sensorDataLength);
+          //sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"Perfect for a date.\",\"Value\":"+String(analogLightValue)+"}}";
+          //sensorDataLength = sensorData.length();
+          //sendData(sensorData,sensorDataLength);
         }  
         if(analogLightValue > 750 && analogLightValue <= 1023){
           Serial.println("Too dark!");
           digitalWrite(LED,HIGH);
           
           //Send data to carriots service
-          sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"Too dark!\",\"Value\":"+String(analogLightValue)+"}}";
-          sensorDataLength = sensorData.length();
-          sendData(sensorData,sensorDataLength);
+          //sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"Too dark!\",\"Value\":"+String(analogLightValue)+"}}";
+          //sensorDataLength = sensorData.length();
+          //sendData(sensorData,sensorDataLength);
         }  
         
         //TODO: use the information from the light sensor 
@@ -1189,7 +1190,10 @@ String doubleToString(float input,int decimalPlaces){
 
 void sendData(String data, int length){
 
-  // Get the website IP & print it
+  //About 1 min to do everything! 
+  
+  //////////////////////////////////
+  //Get the website IP & print it
   ip = 0;
   Serial.print(WEBSITE); Serial.print(F(" -> "));
   while (ip == 0) {
