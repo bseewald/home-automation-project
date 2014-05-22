@@ -104,9 +104,9 @@ void setup(void) {
   //} 
  
   /* Display the IP address DNS, Gateway, etc. */  
-  while (!displayConnectionDetails()) {
-    delay(1000);
-  } 
+  //while (!displayConnectionDetails()) {
+    //delay(1000);
+  //} 
   
   // Start listening for connections
   chatServer.begin();
@@ -141,7 +141,7 @@ void loop(void)
         //if a newline character is sent (command line is fully recieved)
         if (c == '\n') {
           //output the command
-          Serial.print("Command:"+commandStr);
+          //Serial.print("Command:"+commandStr);
           
           //if the command begins with "set..."
           if(commandStr.indexOf("setOnMove")==0){
@@ -266,7 +266,7 @@ void toggleRemotePin(int value, byte sensorAddress0, byte sensorAddress1,
   if(value){
     pin_state = 0x5;
     
-    Serial.println("set LED ON");
+    //Serial.println("set LED ON");
     //////////////////////////////
     // Packet 1 - LED
     // Begin the API frame 
@@ -320,7 +320,7 @@ void toggleRemotePin(int value, byte sensorAddress0, byte sensorAddress1,
   } else{
     pin_state = 0x4;
     
-    Serial.println("set LED OFF");
+    //Serial.println("set LED OFF");
     //////////////////////////////
     // Packet 1 - LED
     // Begin the API frame 
@@ -378,7 +378,7 @@ void toggleRemotePinMove(int value, byte sensorAddress0, byte sensorAddress1,
 
   if(value){
     
-    Serial.println("set MOVE sensor ON");
+    //Serial.println("set MOVE sensor ON");
     //////////////////////////////////   
     // Packet 2 - SENSOR
     sendByte(frameStartByte);  
@@ -462,7 +462,7 @@ void toggleRemotePinMove(int value, byte sensorAddress0, byte sensorAddress1,
   }
   else{
     
-    Serial.println("set MOVE sensor OFF");
+    //Serial.println("set MOVE sensor OFF");
     //////////////////////////////////   
     // Packet 2 - SENSOR
     sendByte(frameStartByte);  
@@ -511,7 +511,7 @@ void toggleRemotePinGas(int value, byte sensorAddress0, byte sensorAddress1,
   
   if(value){
     
-    Serial.println("set GAS sensor ON");
+    //Serial.println("set GAS sensor ON");
     //////////////////////////////////   
     // Packet 2 - SENSOR
     sendByte(frameStartByte);  
@@ -584,8 +584,8 @@ void toggleRemotePinGas(int value, byte sensorAddress0, byte sensorAddress1,
     sum += sendByte('R');
     
     // The value (0xEA60 for 60s, 0x7530 for 30s, 0x2710 for 10s) 
-    sum += sendByte(0x27);
-    sum += sendByte(0x10);
+    sum += sendByte(0x75);
+    sum += sendByte(0x30);
   
     // Send the checksum
     sendByte( 0xFF - ( sum & 0xFF));
@@ -595,7 +595,7 @@ void toggleRemotePinGas(int value, byte sensorAddress0, byte sensorAddress1,
   }
   else{
     
-    Serial.println("set GAS sensor OFF");
+    //Serial.println("set GAS sensor OFF");
     //////////////////////////////////   
     // Packet 2 - SENSOR
     sendByte(frameStartByte);  
@@ -684,7 +684,7 @@ void toggleRemotePinLight(int value, byte sensorAddress0, byte sensorAddress1,
   
   if(value){
     
-    Serial.println("set LIGHT sensor ON");
+    //Serial.println("set LIGHT sensor ON");
     //////////////////////////////////   
     // Packet 2 - SENSOR
     sendByte(frameStartByte);  
@@ -768,7 +768,7 @@ void toggleRemotePinLight(int value, byte sensorAddress0, byte sensorAddress1,
   }
   else{
     
-    Serial.println("set LIGHT sensor OFF");
+    //Serial.println("set LIGHT sensor OFF");
     //////////////////////////////////   
     // Packet 2 - SENSOR
     sendByte(frameStartByte);  
@@ -856,7 +856,7 @@ void toggleRemotePinTemp(int value, byte sensorAddress0, byte sensorAddress1,
   
   if(value){
   
-    Serial.println("set TEMPERATURE sensor ON");
+    //Serial.println("set TEMPERATURE sensor ON");
     //////////////////////////////////   
     // Packet 2 - SENSOR
     sendByte(frameStartByte);  
@@ -899,7 +899,7 @@ void toggleRemotePinTemp(int value, byte sensorAddress0, byte sensorAddress1,
   }
   else{
   
-    Serial.println("set TEMPERATURE sensor OFF");
+    //Serial.println("set TEMPERATURE sensor OFF");
     //////////////////////////////////   
     // Packet 2 - SENSOR
     sendByte(frameStartByte);  
@@ -945,7 +945,7 @@ void toggleRemotePinTemp(int value, byte sensorAddress0, byte sensorAddress1,
 void queriedSample(byte sensorAddress0, byte sensorAddress1, 
                      byte sensorAddress2, byte sensorAddress3){
                
-    Serial.println("TEMPERATURE sensor DATA");
+    //Serial.println("TEMPERATURE sensor DATA");
     //////////////////////////////////   
     // Packet 1 - SENSOR
     sendByte(frameStartByte);  
@@ -1042,7 +1042,7 @@ void xbeePacket(void){
           sendData(sensorData,sensorDataLength);
         }        
         //TODO: different alarms for different values of gas -> what type of gas it is.
-       */ 
+       
       }  
       else if(aux == 0x04){ //Light sensor
       
@@ -1195,15 +1195,15 @@ void sendData(String data, int length){
   //////////////////////////////////
   //Get the website IP & print it
   ip = 0;
-  Serial.print(WEBSITE); Serial.print(F(" -> "));
+  //Serial.print(WEBSITE); Serial.print(F(" -> "));
   while (ip == 0) {
     if (!cc3000.getHostByName(WEBSITE, &ip)) {
       Serial.println(F("Couldn't resolve!"));
     }
     delay(500);
   }  
-  cc3000.printIPdotsRev(ip);
-  Serial.println();
+  //cc3000.printIPdotsRev(ip);
+  //Serial.println();
   
   /*
   //Print request for debug purposes
@@ -1222,7 +1222,7 @@ void sendData(String data, int length){
   // Send request
   Adafruit_CC3000_Client client = cc3000.connectTCP(ip, 80);
   if (client.connected()) {
-    Serial.println("Connected!");
+    //Serial.println("Connected!");
     client.println("POST /streams HTTP/1.1");
     client.println("Host: api.carriots.com");
     client.println("Accept: application/json");
