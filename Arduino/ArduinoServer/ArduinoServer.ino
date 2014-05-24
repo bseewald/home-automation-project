@@ -19,8 +19,8 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
                                          SPI_CLOCK_DIVIDER); 
 
 //WI-FI CONFIGURATION
-#define WLAN_SSID       "fsilva"             
-#define WLAN_PASS       "bru2465betinharml"
+#define WLAN_SSID       "SSID"             
+#define WLAN_PASS       "PASSWORD"
 #define WLAN_SECURITY   WLAN_SEC_WPA2
 
 //SERVER
@@ -39,11 +39,11 @@ const byte remoteATOptionApplyChanges = 0x02;
 
 //Carriots parameters
 #define WEBSITE "api.carriots.com"
-#define API_KEY "b7e992faab607d789b983b89bda36dc7dad1e5d05e8f3e9c9f9c5a100a9a2634"
-#define MOTION_DEVICE "Motion@brunaseewald.brunaseewald"
-#define GAS_DEVICE "Gas@brunaseewald.brunaseewald"
-#define LIGHT_DEVICE "Light@brunaseewald.brunaseewald"
-#define TEMP_DEVICE  "Temperature@brunaseewald.brunaseewald"
+#define API_KEY "API_KEY"
+#define MOTION_DEVICE "IDDEVOLOPER"
+#define GAS_DEVICE "IDDEVOLOPER"
+#define LIGHT_DEVICE "IDDEVOLOPER"
+#define TEMP_DEVICE  "IDDEVOLOPER"
 
 uint32_t ip;
 String sensorData;
@@ -107,6 +107,19 @@ void setup(void) {
   //while (!displayConnectionDetails()) {
     //delay(1000);
   //} 
+  
+  //////////////////////////////////
+  //Get the website IP & print it  
+  ip = 0;
+  //Serial.print(WEBSITE); Serial.print(F(" -> "));
+  while (ip == 0) {
+    if (!cc3000.getHostByName(WEBSITE, &ip)) {
+      Serial.println(F("Couldn't resolve!"));
+    }
+    delay(500);
+  }    
+  //cc3000.printIPdotsRev(ip);
+  //Serial.println();
   
   // Start listening for connections
   chatServer.begin();
@@ -1190,21 +1203,8 @@ String doubleToString(float input,int decimalPlaces){
 
 void sendData(String data, int length){
 
-  //About 1 min to do everything! 
-  
-  //////////////////////////////////
-  //Get the website IP & print it
-  ip = 0;
-  //Serial.print(WEBSITE); Serial.print(F(" -> "));
-  while (ip == 0) {
-    if (!cc3000.getHostByName(WEBSITE, &ip)) {
-      Serial.println(F("Couldn't resolve!"));
-    }
-    delay(500);
-  }  
-  //cc3000.printIPdotsRev(ip);
-  //Serial.println();
-  
+  //About 1 min to send ?!?!?!
+      
   /*
   //Print request for debug purposes
   Serial.println("POST /streams HTTP/1.1");
@@ -1222,7 +1222,7 @@ void sendData(String data, int length){
   // Send request
   Adafruit_CC3000_Client client = cc3000.connectTCP(ip, 80);
   if (client.connected()) {
-    //Serial.println("Connected!");
+    Serial.println("Connected Carriots!");
     client.println("POST /streams HTTP/1.1");
     client.println("Host: api.carriots.com");
     client.println("Accept: application/json");
@@ -1240,19 +1240,18 @@ void sendData(String data, int length){
     return;
   }
   
-  //client.close();  
-  
-  //Serial.println(F("-------------------------------------"));
+  /*
+  //If there's incoming data from the net connection, send it out the serial port
+  //This is for debugging purposes only
   while (client.connected()) {
     while (client.available()) {
       char c = client.read();
       Serial.print(c);
     }
   }
+  */
+  Serial.println("Sended!");
   client.close();
-  //Serial.println(F("-------------------------------------")); 
-  Serial.println(); 
-  
 }
 
 /**************************************************************************/
