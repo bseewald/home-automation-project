@@ -270,7 +270,7 @@ public class AcquirementActivity extends Activity {
 			boolean result = false;
 			try {
 				//create a new socket instance
-				SocketAddress sockaddr = new InetSocketAddress("192.168.0.106", 5000); //MUDAR IP!!!
+				SocketAddress sockaddr = new InetSocketAddress("192.168.8.120", 5000); 
 				nsocket = new Socket();
 				//connect and set a 10 second connection timeout
 				nsocket.connect(sockaddr,10000);

@@ -7,8 +7,8 @@
   by Bruna Seewald
   
 */
-#include<SPI.h>
-#include<Adafruit_CC3000.h>
+#include <SPI.h>
+#include <Adafruit_CC3000.h>
 #include "utility/socket.h"
 
 //CC3000 PINS
@@ -16,11 +16,11 @@
 #define ADAFRUIT_CC3000_VBAT  5
 #define ADAFRUIT_CC3000_CS    10
 Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ, ADAFRUIT_CC3000_VBAT,
-                                         SPI_CLOCK_DIVIDER); 
+                                         SPI_CLOCK_DIV2); 
 
 //WI-FI CONFIGURATION
-#define WLAN_SSID       "SSID"             
-#define WLAN_PASS       "PASSWORD"
+#define WLAN_SSID       "yourSSID"
+#define WLAN_PASS       "yourPassword"
 #define WLAN_SECURITY   WLAN_SEC_WPA2
 
 //SERVER
@@ -38,16 +38,15 @@ const byte remoteATOptionApplyChanges = 0x02;
 #define LED 8
 
 //Carriots parameters
-#define WEBSITE "api.carriots.com"
-#define API_KEY "API_KEY"
-#define MOTION_DEVICE "IDDEVOLOPER"
-#define GAS_DEVICE "IDDEVOLOPER"
-#define LIGHT_DEVICE "IDDEVOLOPER"
-#define TEMP_DEVICE  "IDDEVOLOPER"
+#define WEBSITE  "api.carriots.com"
+#define API_KEY "yourApiKey"
+#define MOTION_DEVICE  "yourDeviceName@yourUserName"
+#define GAS_DEVICE  "yourDeviceName@yourUserName"
+#define LIGHT_DEVICE  "yourDeviceName@yourUserName"
+#define TEMP_DEVICE  "yourDeviceName@yourUserName"
 
 uint32_t ip;
 String sensorData;
-int sensorDataLength = 0;
 
 void setup(void) {
   
@@ -73,10 +72,10 @@ void setup(void) {
 
   
   // Optional setting a static IP Address 
-  unsigned long IPAdd[1] = {0x6A00A8C0};       //192.168.0.106
+  unsigned long IPAdd[1] = {0x7808A8C0};       //192.168.8.120
   unsigned long SubNetMask[1] = {0x00FFFFFF};  //225.255.255.0
-  unsigned long dfGW[1] = {0x0100A8C0};        //192.168.0.1
-  unsigned long DNSServer[1] = {0x0100A8C0};   //192.168.0.1
+  unsigned long dfGW[1] = {0x0108A8C0};        //192.168.8.1
+  unsigned long DNSServer[1] = {0x0108A8C0};   //192.168.8.1
   
   //unsigned long IPAdd[4] = {0x00};
   //unsigned long SubNetMask[4] = {0x00};
@@ -101,12 +100,13 @@ void setup(void) {
   //while (!cc3000.checkDHCP())
   //{
     //delay(100); // ToDo: Insert a DHCP timeout!
-  //} 
+  //  } 
  
   /* Display the IP address DNS, Gateway, etc. */  
   //while (!displayConnectionDetails()) {
     //delay(1000);
   //} 
+  
   
   //////////////////////////////////
   //Get the website IP & print it  
@@ -117,9 +117,7 @@ void setup(void) {
       Serial.println(F("Couldn't resolve!"));
     }
     delay(500);
-  }    
-  //cc3000.printIPdotsRev(ip);
-  //Serial.println();
+  } 
   
   // Start listening for connections
   chatServer.begin();
@@ -132,23 +130,23 @@ void setup(void) {
 void loop(void)
 {
   //Try to get a client which is connected.
-  Adafruit_CC3000_ClientRef client = chatServer.available();
-  if (client) {
+  Adafruit_CC3000_ClientRef clientAndroid = chatServer.available();
+  if (clientAndroid) {
     //Command string where incoming commands are stored
     String commandStr ="";
     
     //if a client is connected
-    while (client.connected()) {
+    while (clientAndroid.connected()) {
       
       //Client connected
       //readSerial();
       xbeePacket();
             
       //if client is sending
-      if (client.available()) {
+      if (clientAndroid.available()) {
         //reading the inputs from the client
         //and adds them to the command String
-        char c = client.read();
+        char c = clientAndroid.read();
         commandStr+=c;
         
         //if a newline character is sent (command line is fully recieved)
@@ -165,8 +163,7 @@ void loop(void)
             setBuzzer(1);
             //Send data to carriots service
             sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(MOTION_DEVICE)+"\",\"at\":\"now\",\"data\":{\"MotionSensor\":\"ON\"}}";
-            sensorDataLength = sensorData.length();
-            sendData(sensorData,sensorDataLength);
+            sendData(sensorData);  
           }
           if(commandStr.indexOf("setOffMove")==0){
             //Set the xbee module (XBEE 2)
@@ -176,8 +173,7 @@ void loop(void)
             setBuzzer(0);
             //Send data to carriots service
             sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(MOTION_DEVICE)+"\",\"at\":\"now\",\"data\":{\"MotionSensor\":\"OFF\"}}";
-            sensorDataLength = sensorData.length();
-            sendData(sensorData,sensorDataLength);
+            sendData(sensorData);
           }
           if(commandStr.indexOf("setOnGas")==0){
             //Set the xbee module (XBEE 1)
@@ -187,8 +183,7 @@ void loop(void)
             setBuzzer(1);
             //Send data to carriots service
             sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(GAS_DEVICE)+"\",\"at\":\"now\",\"data\":{\"GasSensor\":\"ON\"}}";
-            sensorDataLength = sensorData.length();
-            sendData(sensorData,sensorDataLength);
+            sendData(sensorData);
           }
           if(commandStr.indexOf("setOffGas")==0){
             //Set the xbee module (XBEE 1)
@@ -198,8 +193,7 @@ void loop(void)
             setBuzzer(0);
             //Send data to carriots service
             sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(GAS_DEVICE)+"\",\"at\":\"now\",\"data\":{\"GasSensor\":\"OFF\"}}";
-            sensorDataLength = sensorData.length();
-            sendData(sensorData,sensorDataLength);
+            sendData(sensorData);
           }
           if(commandStr.indexOf("setOnLight")==0){
             //Set the xbee module (XBEE 1)
@@ -209,8 +203,7 @@ void loop(void)
             setBuzzer(1);
             //Send data to carriots service
             sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"ON\"}}";
-            sensorDataLength = sensorData.length();
-            sendData(sensorData,sensorDataLength);
+            sendData(sensorData);
           }
           if(commandStr.indexOf("setOffLight")==0){
             //Set the xbee module (XBEE 1)
@@ -220,8 +213,7 @@ void loop(void)
             setBuzzer(0);
             //Send data to carriots service
             sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"OFF\"}}";
-            sensorDataLength = sensorData.length();
-            sendData(sensorData,sensorDataLength);
+            sendData(sensorData);
           }
           if(commandStr.indexOf("setOnTemp")==0){
             //Set the xbee module (XBEE 1)
@@ -230,9 +222,8 @@ void loop(void)
             //Buzzer for On
             setBuzzer(1);
             //Send data to carriots service
-            sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(TEMP_DEVICE)+"\",\"at\":\"now\",\"data\":{\"TemperatureSensor\":\"ON\"}}";
-            sensorDataLength = sensorData.length();
-            sendData(sensorData,sensorDataLength);
+            sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(TEMP_DEVICE)+"\",\"at\":\"now\",\"data\":{\"TempSensor\":\"ON\"}}";
+            sendData(sensorData);
           }
           if(commandStr.indexOf("setOffTemp")==0){
             //Set the xbee module (XBEE 1)
@@ -241,9 +232,8 @@ void loop(void)
             //Buzzer for Off
             setBuzzer(0);
             //Send data to carriots service
-            sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(TEMP_DEVICE)+"\",\"at\":\"now\",\"data\":{\"TemperatureSensor\":\"OFF\"}}";
-            sensorDataLength = sensorData.length();
-            sendData(sensorData,sensorDataLength);           
+            sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(TEMP_DEVICE)+"\",\"at\":\"now\",\"data\":{\"TempSensor\":\"OFF\"}}";
+            sendData(sensorData);           
           }
           if(commandStr.indexOf("tempValue")==0){
             queriedSample(0x40,0xB0,0x9D,0x68);
@@ -257,7 +247,7 @@ void loop(void)
     // give the client time to receive the data
     delay(1);
     // close the connection:
-    client.close();
+    clientAndroid.close();
   }
   
   //Client not connected
@@ -1024,9 +1014,8 @@ void xbeePacket(void){
           //TODO: button option to turn OFF the alarm  
           
           //Send data to carriots service
-          sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(MOTION_DEVICE)+"\",\"at\":\"now\",\"data\":{\"MotionSensor\":\"ALARM!\"}}";
-          sensorDataLength = sensorData.length();
-          sendData(sensorData,sensorDataLength);
+          sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(MOTION_DEVICE)+"\",\"at\":\"now\",\"data\":{\"Motion\":\"ALARM!\"}}";
+          sendData(sensorData);
         }
       } 
       byte aux = Serial1.read();
@@ -1041,18 +1030,16 @@ void xbeePacket(void){
         //Serial.println(analogGasValue);
         
         //Send data to carriots service
-        //sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(GAS_DEVICE)+"\",\"at\":\"now\",\"data\":{\"GasSensor\":\"ON\",\"Value\":"+String(analogGasValue)+"}}";
-        //sensorDataLength = sensorData.length();
-        //sendData(sensorData,sensorDataLength);
+        //sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(GAS_DEVICE)+"\",\"at\":\"now\",\"data\":{\"GasValue\":"+String(analogGasValue)+"}}";
+        //sendData(sensorData);
         
         if(analogGasValue > 900){ 
           //Gas leakage - Alarm!
           setAlarm();
           
           //Send data to carriots service
-          sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(GAS_DEVICE)+"\",\"at\":\"now\",\"data\":{\"GasSensor\":\"ALARM!\",\"Value\":"+String(analogGasValue)+"}}";  
-          sensorDataLength = sensorData.length();
-          sendData(sensorData,sensorDataLength);
+          sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(GAS_DEVICE)+"\",\"at\":\"now\",\"data\":{\"Gas\":\"ALARM!\"}}";  
+          sendData(sensorData);
         }        
         //TODO: different alarms for different values of gas -> what type of gas it is.
        
@@ -1068,31 +1055,28 @@ void xbeePacket(void){
         //Serial.println(analogLightValue); 
         
         if(analogLightValue >= 0 && analogLightValue <= 350 ){
-          Serial.println("No need for more light.");
+          //Serial.println("Lights ON");
           digitalWrite(LED,HIGH);
           
           //Send data to carriots service
-          //sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"No need for more light.\",\"Value\":"+String(analogLightValue)+"}}";
-          //sensorDataLength = sensorData.length();
-          //sendData(sensorData,sensorDataLength);
+          sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"Lights\":\"ON\"}}";
+          sendData(sensorData);
         }
         if(analogLightValue > 350  && analogLightValue <= 750){
-          Serial.println("Perfect for a date.");
+          //Serial.println("Lights Low.");
           digitalWrite(LED,LOW);
           
           //Send data to carriots service
-          //sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"Perfect for a date.\",\"Value\":"+String(analogLightValue)+"}}";
-          //sensorDataLength = sensorData.length();
-          //sendData(sensorData,sensorDataLength);
+          sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"Lights\":\"Low\"}}";
+          sendData(sensorData);
         }  
         if(analogLightValue > 750 && analogLightValue <= 1023){
-          Serial.println("Too dark!");
+          //Serial.println("Lights OFF");
           digitalWrite(LED,HIGH);
           
           //Send data to carriots service
-          //sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"LightSensor\":\"Too dark!\",\"Value\":"+String(analogLightValue)+"}}";
-          //sensorDataLength = sensorData.length();
-          //sendData(sensorData,sensorDataLength);
+          sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(LIGHT_DEVICE)+"\",\"at\":\"now\",\"data\":{\"Lights\":\"OFF\"}}";
+          sendData(sensorData);
         }  
         
         //TODO: use the information from the light sensor 
@@ -1121,9 +1105,8 @@ void xbeePacket(void){
         chatServer.println("setTempValue:"+stringCelcius);
         
         //Send data to carriots service
-        sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(TEMP_DEVICE)+"\",\"at\":\"now\",\"data\":{\"TemperatureSensor\":\"ON\",\"Degrees Celcius\":"+String(stringCelcius)+"}}";
-        sensorDataLength = sensorData.length();
-        sendData(sensorData,sensorDataLength);
+        sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(TEMP_DEVICE)+"\",\"at\":\"now\",\"data\":{\"Degrees Celcius\":"+String(stringCelcius)+"}}";
+        sendData(sensorData);
       }  
      } 
     }    
@@ -1201,10 +1184,16 @@ String doubleToString(float input,int decimalPlaces){
   }
 }
 
-void sendData(String data, int length){
+void sendData(String data){
 
-  //About 1 min to send ?!?!?!
-      
+  char auxLength[10];
+  itoa(data.length(),auxLength,10);
+  
+  char charData[data.length()+1];
+  data.toCharArray(charData,data.length()+1);
+  
+  //Serial.println(data.length());
+  
   /*
   //Print request for debug purposes
   Serial.println("POST /streams HTTP/1.1");
@@ -1222,35 +1211,34 @@ void sendData(String data, int length){
   // Send request
   Adafruit_CC3000_Client client = cc3000.connectTCP(ip, 80);
   if (client.connected()) {
-    Serial.println("Connected Carriots!");
-    client.println("POST /streams HTTP/1.1");
-    client.println("Host: api.carriots.com");
-    client.println("Accept: application/json");
-    client.println("User-Agent: Arduino-Carriots");
-    client.println("Content-Type: application/json");
-    client.println("carriots.apikey: " + String(API_KEY));
-    client.println("Content-Length: " + String(length));
-    client.println("Connection: close");
-    client.println();
-    
-    client.println(data);
+    //Serial.println("Connected Carriots!");      
+    client.fastrprint(F("POST /streams HTTP/1.1\r\n"));
+    client.fastrprint(F("Host: api.carriots.com\r\n"));
+    client.fastrprint(F("Accept: application/json\r\n"));
+    client.fastrprint(F("User-Agent: Arduino-Carriots\r\n"));
+    client.fastrprint(F("Content-Type: application/json\r\n"));
+    client.fastrprint(F("carriots.apikey: ")); client.fastrprint(API_KEY); client.fastrprint(F("\r\n"));
+    client.fastrprint(F("Content-Length: ")); client.fastrprint(auxLength); client.fastrprint(F("\r\n"));
+    client.fastrprint(F("Connection: close\r\n"));
+    client.fastrprint(F("\r\n"));
+    client.fastrprintln(charData);
     
   } else {
     Serial.println(F("Connection failed"));    
     return;
   }
   
-  /*
+  
   //If there's incoming data from the net connection, send it out the serial port
   //This is for debugging purposes only
   while (client.connected()) {
     while (client.available()) {
       char c = client.read();
-      Serial.print(c);
+      //Serial.print(c);
     }
   }
-  */
-  Serial.println("Sended!");
+  
+  //Serial.println("Sended!");
   client.close();
 }
 
