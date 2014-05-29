@@ -129,6 +129,19 @@ void setup(void) {
 
 void loop(void)
 {
+  //Checks if the wifi connection is still ON
+  if(!cc3000.checkConnected()){
+     cc3000.reboot();
+     delay(5000);
+     if (!cc3000.begin()) {
+        while(1);
+     }
+     if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
+        while(1);
+     }
+     Serial.println(F("Connection restarted!"));
+  }
+  
   //Try to get a client which is connected.
   Adafruit_CC3000_ClientRef clientAndroid = chatServer.available();
   if (clientAndroid) {
