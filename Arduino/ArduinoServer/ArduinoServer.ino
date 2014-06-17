@@ -6,6 +6,8 @@
   created 17.04.2014
   by Bruna Seewald
   
+  This work is licensed under a Creative Commons Attribution 4.0 International License.
+  http://creativecommons.org/licenses/by/4.0/
 */
 #include <SPI.h>
 #include <Adafruit_CC3000.h>
@@ -397,14 +399,18 @@ void toggleRemotePinMove(int value, byte sensorAddress0, byte sensorAddress1,
     //Serial.println("set MOVE sensor ON");
     //////////////////////////////////   
     // Packet 2 - SENSOR
-    sendByte(frameStartByte);  
+    // Begin the API frame 
+    sendByte(frameStartByte); 
+    // High and low parts of the frame length (not counting checksum)  
     sendByte(0x0);
     sendByte(0x10);
-    
+    // Accumulate the checksum
     long sum = 0; 
-
+    // Indicate this frame contains a Remote AT command
     sum += sendByte(frameTypeRemoteAT);
+    // frame ID set to zero for no reply
     sum += sendByte(0x0); 
+    // The following bytes indicate the 64-bit address of the recipient. 
     // DH: 0x0013A200 
     sum += sendByte(0x0);
     sum += sendByte(0x13);
@@ -416,6 +422,8 @@ void toggleRemotePinMove(int value, byte sensorAddress0, byte sensorAddress1,
     sum += sendByte(sensorAddress2); 
     sum += sendByte(sensorAddress3);
 
+    // The following 2 bytes indicate the 16-bit address of the recipient. 
+    // Not used in this case
     sum += sendByte(0xFF);
     sum += sendByte(0xFE);
   

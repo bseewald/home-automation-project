@@ -25,8 +25,10 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 /**
+ * This work is licensed under a Creative Commons Attribution 4.0 International License.
+ * http://creativecommons.org/licenses/by/4.0/
+ * 
  * @author Bruna Seewald <brubetinha@gmail.com> 
- *
  */
 public class AcquirementActivity extends Activity {
 	

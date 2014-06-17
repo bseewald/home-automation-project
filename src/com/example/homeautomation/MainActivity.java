@@ -15,8 +15,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 /**
+ * This work is licensed under a Creative Commons Attribution 4.0 International License.
+ * http://creativecommons.org/licenses/by/4.0/
+ * 
  * @author Bruna Seewald <brubetinha@gmail.com> 
- *
  */
 
 public class MainActivity extends Activity implements OnClickListener {
