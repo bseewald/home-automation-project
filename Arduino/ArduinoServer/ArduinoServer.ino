@@ -1,7 +1,7 @@
 /*
   Modified bidirectional TCP Server (by Laurid Meyer), 
-  ChatServer (by Limor Fried and Kevin Townsend),
-  Carriots Service (by Marco Schwartz)
+  Modified ChatServer (by Limor Fried and Kevin Townsend),
+  Modified Carriots Service (by Marco Schwartz)
   
   created 17.04.2014
   by Bruna Seewald
@@ -12,6 +12,7 @@
 #include <SPI.h>
 #include <Adafruit_CC3000.h>
 #include "utility/socket.h"
+#include <avr/wdt.h>
 
 //CC3000 PINS
 #define ADAFRUIT_CC3000_IRQ   3 
@@ -47,10 +48,24 @@ const byte remoteATOptionApplyChanges = 0x02;
 #define LIGHT_DEVICE  "yourDeviceName@yourUserName"
 #define TEMP_DEVICE  "yourDeviceName@yourUserName"
 
+// Optional setting a static IP Address 
+unsigned long IPAdd[1] = {0x7808A8C0};       //192.168.8.120
+unsigned long SubNetMask[1] = {0x00FFFFFF};  //225.255.255.0
+unsigned long dfGW[1] = {0x0108A8C0};        //192.168.8.1
+unsigned long DNSServer[1] = {0x0108A8C0};   //192.168.8.1
+  
+//unsigned long IPAdd[4] = {0x00};
+//unsigned long SubNetMask[4] = {0x00};
+//unsigned long dfGW[4] = {0x00};
+//unsigned long DNSServer[4] = {0x00};
+
 uint32_t ip;
 String sensorData;
 
 void setup(void) {
+  
+  //Disable wachtdog
+  //wdt_disable();
   
   //Initialize serial and wait for port to open:
   Serial.begin(115200);
@@ -63,7 +78,6 @@ void setup(void) {
     Serial.println(F("Couldn't begin()! Check your wiring?"));
     while(1);
   }
-
   
   /* Optional: Get the SSID list (not available in 'tiny' mode) */
 /*  
@@ -71,19 +85,7 @@ void setup(void) {
   listSSIDResults();
 #endif
 */
-
-  
-  // Optional setting a static IP Address 
-  unsigned long IPAdd[1] = {0x7808A8C0};       //192.168.8.120
-  unsigned long SubNetMask[1] = {0x00FFFFFF};  //225.255.255.0
-  unsigned long dfGW[1] = {0x0108A8C0};        //192.168.8.1
-  unsigned long DNSServer[1] = {0x0108A8C0};   //192.168.8.1
-  
-  //unsigned long IPAdd[4] = {0x00};
-  //unsigned long SubNetMask[4] = {0x00};
-  //unsigned long dfGW[4] = {0x00};
-  //unsigned long DNSServer[4] = {0x00};
-  
+    
   if (!cc3000.setStaticIPAddress(IPAdd, SubNetMask, dfGW, DNSServer))
   {
     Serial.println(F("Failed to set static IP"));
@@ -121,6 +123,14 @@ void setup(void) {
     delay(500);
   } 
   
+  ipPing = 0;
+  while (ipPing == 0) {
+    if (!cc3000.getHostByName("www.google.com", &ipPing)) {
+      Serial.println(F("Couldn't resolve!"));
+    }
+    delay(500);
+  } 
+  
   // Start listening for connections
   chatServer.begin();
   //Serial.println(F("Waiting..."));
@@ -132,17 +142,8 @@ void setup(void) {
 void loop(void)
 {
   //Checks if the wifi connection is still ON
-  if(!cc3000.checkConnected()){
-     cc3000.reboot();
-     delay(5000);
-     if (!cc3000.begin()) {
-        while(1);
-     }
-     if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
-        while(1);
-     }
-     Serial.println(F("Connection restarted!"));
-  }
+  //Bootloader: Watchdog needs to be fixed! 
+  //testConnection();
   
   //Try to get a client which is connected.
   Adafruit_CC3000_ClientRef clientAndroid = chatServer.available();
@@ -1262,6 +1263,17 @@ void sendData(String data){
   //Serial.println("Sended!");
   client.close();
 }
+
+int testConnection(){
+
+  uint8_t replies = cc3000.ping(ipPing, 3);
+  if(!replies){
+    Serial.println(F("Reset"));
+    //Watchdog will reset in 1s.
+    wdt_enable(WDTO_1S); 
+    while(1);
+  }  
+} 
 
 /**************************************************************************/
 /*!
