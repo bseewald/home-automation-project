@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AcquirementActivity" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:orientation="horizontal"
+        android:padding="20dp" >
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/motion" />
+
+        <TextView
+            android:id="@+id/txMove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="   Motion          "
+            android:textColor="@android:color/black"
+            android:textSize="10pt" />
+
+        <ToggleButton
+            android:id="@+id/btnMove"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="2.05"
+            android:freezesText="true"
+            android:text="Motion"
+            android:textColor="@android:color/black" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/linearLayout2"
+        android:orientation="horizontal"
+        android:padding="20dp" >
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/propane" />
+
+        <TextView
+            android:id="@+id/txGas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  Gas               "
+            android:textColor="@android:color/black"
+            android:textSize="10pt" />
+
+        <ToggleButton
+            android:id="@+id/btnGas"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="2.05"
+            android:text="Gas"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/linearLayout3"
+        android:orientation="horizontal"
+        android:padding="20dp" >
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/lamp" />
+
+        <TextView
+            android:id="@+id/txLight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" Luminosity     "
+            android:textColor="@android:color/black"
+            android:textSize="10pt" />
+
+        <ToggleButton
+            android:id="@+id/btnLight"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="2.05"
+            android:text="Light"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/linearLayout4"
+        android:orientation="horizontal"
+        android:padding="20dp" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="45dp"
+            android:layout_height="50dp"
+            android:src="@drawable/thermometer" />
+
+        <TextView
+            android:id="@+id/txTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temperature  "
+            android:textColor="@android:color/black"
+            android:textSize="10pt" />
+
+        <ToggleButton
+            android:id="@+id/btnTemp"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:layout_weight="2.05"
+            android:text="Temp"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txTempValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/btnUpdate"
+        android:layout_below="@+id/linearLayout5"
+        android:layout_marginRight="16dp"
+        android:text="Temperature Now:"
+        android:textSize="8pt" />
+
+    <Button
+        android:id="@+id/btnUpdate"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txTempValue"
+        android:layout_centerHorizontal="true"
+        android:text="Update" />
+
+    <TextView
+        android:id="@+id/textValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnUpdate"
+        android:layout_toRightOf="@+id/txTempValue"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/btnConnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnUpdate"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="21dp"
+        android:text="Connect" />
+
+</RelativeLayout>

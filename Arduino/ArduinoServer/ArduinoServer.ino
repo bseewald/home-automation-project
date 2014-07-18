@@ -1121,10 +1121,10 @@ void xbeePacket(void){
         int analogTempValue = analogLSB + (analogMSB * 256);
         //Serial.println(analogTempValue); 
         
-        float celcius = ((analogTempValue/1023.0)*1230)/10.0;
+        float celsius = ((analogTempValue/1023.0)*1230)/10.0;
 
-        String stringCelcius = doubleToString(celcius,2);
-        chatServer.println("setTempValue:"+stringCelcius);
+        String stringCelsius = doubleToString(celsius,2);
+        chatServer.println("setTempValue:"+stringCelsius);
         
         //Send data to carriots service
         sensorData = "{\"protocol\":\"v2\",\"device\":\""+String(TEMP_DEVICE)+"\",\"at\":\"now\",\"data\":{\"Degrees Celcius\":"+String(stringCelcius)+"}}";
