@@ -1,5 +1,5 @@
-**Sistema de Automação Residencial de baixo custo para redes sem fio**
-======================================================================
+Sistema de Automação Residencial de baixo custo para redes sem fio
+==================================================================
 
 Este projeto foi desenvolvido durante o trabalho de conclusão em Engenharia de Computação pela Universidade Federal do Rio Grande do Sul.
 
@@ -13,7 +13,7 @@ O projeto de software foi desenvolvido em três partes:
 
 Os códigos encontram-se no endereço:
 
-	* (https://github.com/brubetinha/home-automation-project)
+	* https://github.com/brubetinha/home-automation-project
 
 e para melhor compreensão será explicada a estrutura dos arquivos disponibilizados.
 
