@@ -1,0 +1,34 @@
+**Sistema de Automação Residencial de baixo custo para redes sem fio**
+======================================================================
+
+Este projeto foi desenvolvido durante o trabalho de conclusão em Engenharia de Computação pela Universidade Federal do Rio Grande do Sul.
+
+O sistema de automação é composto por duas partes, divididas em hardware e software. O hardware contém os circuitos e os sensores, mostrados e explicados no capítulo 3.2 do trabalho e que são configurados e controlados pelo software implementado. 
+
+O projeto de software foi desenvolvido em três partes: 
+
+	* Smart House Control: Aplicativo Android que permite o controle dos sensores de maneira local. Ou seja, através da rede Wi-Fi da residência.
+	* Software do Controlador
+	* Conectividade com a Nuvem
+
+Os códigos encontram-se no endereço:
+
+	* (https://github.com/brubetinha/home-automation-project)
+
+e para melhor compreensão será explicada a estrutura dos arquivos disponibilizados.
+
+Na pasta Android encontra-se o projeto do aplicativo que foi desenvolvido no Eclipse. Neste projeto, os arquivos principais são:
+
+	* AndroidManifest.xml: que contém informações do aplicativo que serão passadas para o sistema Android.
+	* Activity_main.xml e acquirement_layout.xml: contêm a programação dos layouts das telas. Cada arquivo corresponde a uma das telas e elas encontram-se dentro da pasta res/layout/ .
+	* MainActivity.java e AcquirementActivity.java: arquivos que contêm a programação do cliente Android via sockets.
+
+Também encontra-se disponível no diretório central um arquivo .apk que permite instalar o aplicativo no celular e testar o sistema. 
+
+Na pasta Arduino está o arquivo ArduinoServer, que possui toda a implementação do controlador. Ele possui a extensão .ino pois foi programado na IDE do Arduino, que por padrão salva todos os arquivos assim. No entanto, o código foi feito em C.
+
+O código utiliza a biblioteca Adafruit_CC3000.h, que possui funções para a configuração e uso da rede Wi-Fi e que também permite criar um servidor simples com até quatro conexões simultâneas. 
+
+Neste mesmo arquivo, uma parte do código é referente a conectividade com a Nuvem. A linha 181 do código mostra como a informação deve ser formatada e na linha 1209 inicia a função que monta e envia a requisição HTTP para a plataforma Carriots.
+
+Informações mais detalhadas podem ser encontradas no próprio código, que está devidamente comentado.
